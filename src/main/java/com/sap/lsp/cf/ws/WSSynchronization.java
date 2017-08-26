@@ -2,7 +2,6 @@ package com.sap.lsp.cf.ws;
 
 import com.sap.lsp.cf.ws.WSChangeObserver.ChangeType;
 import com.sap.lsp.cf.ws.WSChangeObserver.LSPDestination;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.json.*;
@@ -141,7 +140,8 @@ public class WSSynchronization extends HttpServlet {
 		String artifactRelPath;
 		List<String> extracted = new ArrayList<>();
 		artifactRelPath = request.getRequestURI().substring(request.getServletPath().length() + 1 );
-		File destination = new File(FilenameUtils.normalize(this.saveDir + artifactRelPath));
+		artifactRelPath = FilenameUtils.normalize(artifactRelPath);
+		File destination = new File(this.saveDir + artifactRelPath);
 		if (destination.exists()) {
 			response.setContentType("application/json");
 			response.getWriter().append(String.format("{ \"error\": \"already exists %s\"}", destination.getPath()));
@@ -188,11 +188,12 @@ public class WSSynchronization extends HttpServlet {
 
 		// Otherwise process data passed from DI
 		String artifactRelPath = request.getRequestURI().substring(request.getServletPath().length() + 1);
+		artifactRelPath = FilenameUtils.normalize(artifactRelPath);
 		String artifactPath = this.saveDir + artifactRelPath;
 		List<String> extracted = new ArrayList<>();
 		WSChangeObserver changeObserver = null;
 
-		File destination = new File(FilenameUtils.normalize(artifactPath));
+		File destination = new File(artifactPath);
 		// Expected: one part containing zip
 
 		try{
@@ -222,11 +223,12 @@ public class WSSynchronization extends HttpServlet {
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String artifactRelPath = request.getRequestURI().substring(request.getServletPath().length() + 1);
+		artifactRelPath = FilenameUtils.normalize(artifactRelPath);
 		String artifactPath = this.saveDir + artifactRelPath;
 		List<String> deleted  = new ArrayList<>();
 		WSChangeObserver changeObserver = null;
 
-		File destination = new File(FilenameUtils.normalize(artifactPath));
+		File destination = new File(artifactPath);
 		if ( !destination.exists() ) {
 			response.setContentType("application/json");
 			response.getWriter().append(String.format("{ \"notExists\": \"%s\"}", destination.getPath()));
